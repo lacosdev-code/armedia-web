@@ -1,6 +1,34 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+import dynamic from 'next/dynamic';
+import WhatsAppButton from '@/src/components/ui/wa-button';
+import ScrollObserver from '@/src/components/ui/scroll-observer';
+import DarkModeToggle from '@/src/components/ui/dark-mode-toggle';
+import { supabase } from '@/src/lib/supabase';
+import FomoNotification from '@/src/components/sections/FomoNotification';
+
+const CoverageSection = dynamic(() => import('@/src/components/sections/Coverage'), { ssr: false });
+
+/* ─────────────────────────────────────────────
+   TYPES
+   ───────────────────────────────────────────── */
+type Testimonial = {
+  id: number;
+  quote: string;
+  author_name: string;
+  author_role: string;
+  avatar_initials: string;
+};
+
+type Article = {
+  id: number;
+  category: string;
+  title: string;
+  excerpt: string;
+  image_url: string;
+};
 
 export default function Home() {
   // State Manajemen Komponen Form Modal & Mobile Drawer
@@ -8,6 +36,30 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState('GUYUB_1');
   const [activeTab, setActiveTab] = useState('home');
+
+  // Data dari Supabase
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
+
+  useEffect(() => {
+    // Fetch Testimonials
+    supabase
+      .from("testimonials")
+      .select("*")
+      .order("id", { ascending: true })
+      .then(({ data, error }) => {
+        if (!error && data) setTestimonials(data);
+      });
+
+    // Fetch Articles
+    supabase
+      .from("articles")
+      .select("*")
+      .order("id", { ascending: true })
+      .then(({ data, error }) => {
+        if (!error && data) setArticles(data);
+      });
+  }, []);
 
   // Handler interaksi paket & registrasi otomatis ke modal form
   const openRegisterModal = (packageId: string) => {
@@ -28,6 +80,12 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-red-500/10 scroll-smooth">
+      
+      {/* FOMO Social Proof Notification */}
+      <FomoNotification />
+      
+      {/* WhatsApp Floating Button */}
+      <WhatsAppButton />
       
       {/* ================= 1. NAVBAR SECTION (WITH IMAGEKIT LOGO & RESPONSIVE INTERACTION) ================= */}
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-100 bg-white/90 backdrop-blur-md">
@@ -82,14 +140,20 @@ export default function Home() {
             >
               MENU DAFTAR
             </button>
+            <div className="pt-2 border-t border-slate-100">
+              <DarkModeToggle />
+            </div>
           </div>
         )}
       </header>
 
+      {/* Scroll Observer Wrapper */}
+      <ScrollObserver className="contents">
+      
       <main className="pt-24">
         
         {/* ================= 2. HERO SECTION WITH RESPONSIVE BANNER ================= */}
-        <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <section className="reveal-on-scroll mx-auto max-w-7xl px-6 py-16 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="flex flex-col items-start text-left">
             <div className="inline-flex items-center gap-2 rounded bg-red-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-red-600 animate-pulse">
               🇮🇩 Konektivitas Tanpa Batas Masa Depan
@@ -133,7 +197,7 @@ export default function Home() {
         </section>
 
         {/* ================= 3. TENTANG KAMI SECTION ================= */}
-        <section id="about-section" className="mx-auto max-w-7xl px-6 py-24 lg:px-8 border-t border-slate-100 scroll-mt-20">
+        <section id="about-section" className="reveal-on-scroll mx-auto max-w-7xl px-6 py-24 lg:px-8 border-t border-slate-100 scroll-mt-20">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
             <div className="relative group">
               <span className="text-xs font-bold uppercase tracking-widest text-red-600">ABOUT COMPANY</span>
@@ -157,7 +221,7 @@ export default function Home() {
         </section>
 
         {/* ================= 4. VALUE PLANS / LAYANAN SECTION (Elevating Cards) ================= */}
-        <section id="services-section" className="bg-slate-50 py-24 border-t border-slate-100 scroll-mt-20">
+        <section id="services-section" className="reveal-on-scroll bg-slate-50 py-24 border-t border-slate-100 scroll-mt-20">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="text-center">
               <span className="text-xs font-bold uppercase tracking-widest text-red-600">PAKET INTERNET</span>
@@ -272,8 +336,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ================= 5. SERVICES SECTION WITH VECTOR SVG ICONS ================= */}
-        <section id="services-section" className="mx-auto max-w-7xl px-6 py-24 lg:px-8 scroll-mt-20">
+        {/* ================= 5. KEUNGGULAN / WHY US SECTION WITH VECTOR SVG ICONS ================= */}
+        <section id="why-us-section" className="reveal-on-scroll mx-auto max-w-7xl px-6 py-24 lg:px-8 scroll-mt-20">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-3 text-center lg:text-left">
             <div className="lg:col-span-1 flex flex-col justify-center">
               <span className="text-xs font-bold uppercase tracking-widest text-red-600">MENGAPA BERMITRA</span>
@@ -314,7 +378,7 @@ export default function Home() {
         </section>
 
         {/* ================= 6. TESTIMONI SECTION ================= */}
-        <section id="testimonials-section" className="bg-slate-50 py-24 border-t border-b border-slate-100 scroll-mt-20">
+        <section id="testimonials-section" className="reveal-on-scroll bg-slate-50 py-24 border-t border-b border-slate-100 scroll-mt-20">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-16">
               <span className="text-xs font-bold uppercase tracking-widest text-red-600">TESTIMONI</span>
@@ -324,50 +388,30 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md">
-                <p className="text-xs italic text-slate-600 leading-relaxed">
-                  "Internet dari ARMEDIA sangat stabil. Sangat membantu operasional kantor kami yang membutuhkan koneksi cepat setiap hari."
-                </p>
-                <div className="mt-6 border-t border-slate-100 pt-4 flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs">BS</div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900">Budi Santoso</h4>
-                    <p className="text-[10px] text-slate-400 font-semibold">Manager IT, Jakarta</p>
+              {testimonials.length > 0 ? (
+                testimonials.map((t) => (
+                  <div key={t.id} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md">
+                    <p className="text-xs italic text-slate-600 leading-relaxed">
+                      "{t.quote}"
+                    </p>
+                    <div className="mt-6 border-t border-slate-100 pt-4 flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs">{t.avatar_initials}</div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900">{t.author_name}</h4>
+                        <p className="text-[10px] text-slate-400 font-semibold">{t.author_role}</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md">
-                <p className="text-xs italic text-slate-600 leading-relaxed">
-                  "Layanan pelanggan ARMEDIA sangat responsif. Jika ada kendala teknis, tim mereka langsung datang menangani."
-                </p>
-                <div className="mt-6 border-t border-slate-100 pt-4 flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs">SA</div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900">Siti Aminah</h4>
-                    <p className="text-[10px] text-slate-400 font-semibold">Pemilik Café, Bandung</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1 hover:shadow-md">
-                <p className="text-xs italic text-slate-600 leading-relaxed">
-                  "Sejak menggunakan Armedia, lab komputer sekolah dan ujian online siswa berjalan tanpa hambatan sama sekali. Ping stabil dan bandwidth sangat bisa diandalkan."
-                </p>
-                <div className="mt-6 border-t border-slate-100 pt-4 flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs">AF</div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900">Ahmad Fauzi</h4>
-                    <p className="text-[10px] text-slate-400 font-semibold">Kepala Sekolah, Surabaya</p>
-                  </div>
-                </div>
-              </div>
+                ))
+              ) : (
+                <p className="col-span-full text-center text-xs text-slate-400">Memuat testimoni...</p>
+              )}
             </div>
           </div>
         </section>
 
         {/* ================= 7. ARTIKEL & BERITA WITH UNSPLASH MEDIA GRID ================= */}
-        <section id="blog-section" className="mx-auto max-w-7xl px-6 py-24 lg:px-8 scroll-mt-20">
+        <section id="blog-section" className="reveal-on-scroll mx-auto max-w-7xl px-6 py-24 lg:px-8 scroll-mt-20">
           <div className="max-w-2xl mx-auto text-center mb-16">
             <span className="text-xs font-bold uppercase tracking-widest text-red-600">WAWASAN DIGITAL</span>
             <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
@@ -376,75 +420,32 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {/* Artikel 1 */}
-            <div className="group rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm flex flex-col justify-between transition-all duration-300 hover:shadow-lg">
-              <div className="h-40 w-full relative overflow-hidden bg-slate-100">
-                <img src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=400&auto=format&fit=crop" alt="5G" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              </div>
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <span className="text-[9px] font-black tracking-widest uppercase text-red-600">TEKNOLOGI</span>
-                  <h3 className="mt-2 text-sm font-bold text-slate-900 leading-snug group-hover:text-red-600 transition-colors">Masa Depan 5G di Indonesia</h3>
-                  <p className="mt-1 text-xs text-slate-500 line-clamp-2">Bagaimana teknologi 5G akan merubah cara kita berinteraksi secara digital.</p>
+            {articles.length > 0 ? (
+              articles.map((a) => (
+                <div key={a.id} className="group rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm flex flex-col justify-between transition-all duration-300 hover:shadow-lg">
+                  <div className="h-40 w-full relative overflow-hidden bg-slate-100">
+                    <img src={a.image_url} alt={a.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  </div>
+                  <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <span className="text-[9px] font-black tracking-widest uppercase text-red-600">{a.category}</span>
+                      <h3 className="mt-2 text-sm font-bold text-slate-900 leading-snug group-hover:text-red-600 transition-colors">{a.title}</h3>
+                      <p className="mt-1 text-xs text-slate-500 line-clamp-2">{a.excerpt}</p>
+                    </div>
+                    <a href="#" className="mt-4 inline-flex items-center text-xs font-bold text-red-600 uppercase tracking-wider">
+                      BACA <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
+                    </a>
+                  </div>
                 </div>
-                <a href="#" className="mt-4 inline-flex items-center text-xs font-bold text-red-600 uppercase tracking-wider">
-                  BACA <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Artikel 2 */}
-            <div className="group rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm flex flex-col justify-between transition-all duration-300 hover:shadow-lg">
-              <div className="h-40 w-full relative overflow-hidden bg-slate-100">
-                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=400&auto=format&fit=crop" alt="Cyber" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              </div>
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <span className="text-[9px] font-black tracking-widest uppercase text-red-600">KEAMANAN</span>
-                  <h3 className="mt-2 text-sm font-bold text-slate-900 leading-snug group-hover:text-red-600 transition-colors">Cybersecurity Bagi UMKM</h3>
-                  <p className="mt-1 text-xs text-slate-500 line-clamp-2">Tips melindungi data bisnis Anda dari serangan siber yang marak.</p>
-                </div>
-                <a href="#" className="mt-4 inline-flex items-center text-xs font-bold text-red-600 uppercase tracking-wider">
-                  BACA <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Artikel 3 */}
-            <div className="group rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm flex flex-col justify-between transition-all duration-300 hover:shadow-lg">
-              <div className="h-40 w-full relative overflow-hidden bg-slate-100">
-                <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=400&auto=format&fit=crop" alt="Enterprise" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              </div>
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <span className="text-[9px] font-black tracking-widest uppercase text-red-600">INFRASTRUKTUR</span>
-                  <h3 className="mt-2 text-sm font-bold text-slate-900 leading-snug group-hover:text-red-600 transition-colors">Fiber Optic Enterprise</h3>
-                  <p className="mt-1 text-xs text-slate-500 line-clamp-2">Infrastruktur kabel optik sebagai tulang punggung bisnis modern.</p>
-                </div>
-                <a href="#" className="mt-4 inline-flex items-center text-xs font-bold text-red-600 uppercase tracking-wider">
-                  BACA <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Artikel 4 */}
-            <div className="group rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm flex flex-col justify-between transition-all duration-300 hover:shadow-lg">
-              <div className="h-40 w-full relative overflow-hidden bg-slate-100">
-                <img src="https://images.unsplash.com/photo-1558002038-1055907df827?q=80&w=400&auto=format&fit=crop" alt="IoT" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-              </div>
-              <div className="p-5 flex-1 flex flex-col justify-between">
-                <div>
-                  <span className="text-[9px] font-black tracking-widest uppercase text-red-600">INTERNET OF THINGS</span>
-                  <h3 className="mt-2 text-sm font-bold text-slate-900 leading-snug group-hover:text-red-600 transition-colors">Smart Home & IoT 2026</h3>
-                  <p className="mt-1 text-xs text-slate-500 line-clamp-2">Rumah cerdas butuh kestabilan bandwidth tinggi penopang multi-device.</p>
-                </div>
-                <a href="#" className="mt-4 inline-flex items-center text-xs font-bold text-red-600 uppercase tracking-wider">
-                  BACA <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
-                </a>
-              </div>
-            </div>
+              ))
+            ) : (
+              <p className="col-span-full text-center text-xs text-slate-400">Memuat artikel...</p>
+            )}
           </div>
         </section>
+
+        {/* ================= 8.5 COVERAGE SECTION ================= */}
+        <CoverageSection />
 
       </main>
 
@@ -467,7 +468,7 @@ export default function Home() {
               <p className="text-xs text-slate-500 mt-1">Lengkapi data untuk konfirmasi node area cakupan tim lapangan.</p>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); alert('Pendaftaran Terkunci! Prosedur otomatisasi webhook n8n berjalan.'); setIsModalOpen(false); }} className="space-y-5 text-left">
+            <form onSubmit={async (e) => { e.preventDefault(); const form = e.currentTarget; const namaInput = form.querySelector<HTMLInputElement>("input[name='nama']"); const waInput = form.querySelector<HTMLInputElement>("input[type='tel']"); const langgananSelect = form.querySelector<HTMLSelectElement>("select"); const allSelects = form.querySelectorAll<HTMLSelectElement>("select"); const desaSelect = allSelects[2]; const tglSelect = allSelects[3]; const waktuSelect = allSelects[4]; const alamatTextarea = form.querySelector<HTMLTextAreaElement>("textarea"); const nama = namaInput?.value?.trim() || "Pelanggan"; try { const res = await fetch("/api/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ paket: selectedPackage, langganan_sebelumnya: langgananSelect?.value, nama, whatsapp: waInput?.value?.trim(), desa: desaSelect?.value, alamat: alamatTextarea?.value?.trim(), tanggal_pemasangan: tglSelect?.value, waktu_survei: waktuSelect?.value, }), }); if (!res.ok) throw new Error(); } catch (_) {} setIsModalOpen(false); window.location.href = `/terima-kasih?paket=${encodeURIComponent(selectedPackage)}&nama=${encodeURIComponent(nama)}`; }} className="space-y-5 text-left">
               <div>
                 <label className="block text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5">PAKET LAYANAN INTERNET PILIHAN *</label>
                 <select 
@@ -493,7 +494,7 @@ export default function Home() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5">NAMA LENGKAP (SESUAI KTP) *</label>
-                  <input type="text" required placeholder="Contoh: Ahmad Tauchid" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-xs focus:border-red-600 focus:outline-none" />
+                  <input name="nama" type="text" required placeholder="Contoh: Ahmad Tauchid" className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-xs focus:border-red-600 focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1.5">NOMOR WHATSAPP AKTIF *</label>
@@ -557,8 +558,8 @@ export default function Home() {
         </div>
       )}
 
-      {/* ================= 9. FOOTER SECTION (WITH WHITE INVERTED LOGO) ================= */}
-      <footer className="bg-slate-900 text-white pt-20 pb-8 border-t border-slate-800">
+        {/* ================= 9. FOOTER SECTION (WITH WHITE INVERTED LOGO) ================= */}
+      <footer className="reveal-on-scroll bg-slate-900 text-white pt-20 pb-8 border-t border-slate-800">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
             <div className="space-y-4">
@@ -599,10 +600,12 @@ export default function Home() {
           </div>
           <div className="mt-16 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] font-semibold text-slate-500">
             <p>© 2026 PT AKSES ARTHA MEDIA. All rights reserved.</p>
-
+            <a href="/admin" className="text-slate-600 hover:text-red-400 transition-colors">🔑 Admin</a>
           </div>
         </div>
       </footer>
+
+      </ScrollObserver>
 
     </div>
   );

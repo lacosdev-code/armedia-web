@@ -1,0 +1,67 @@
+{
+  "models": [
+    {
+      "title": "DeepSeek V4 Pro (SumoPod - Diskon 75%)",
+      "provider": "openai",
+      "model": "deepseek-v4-pro",
+      "apiKey": "sk-j3562xPgQ5mmHcS9rqpg2A",
+      "apiBase": "https://ai.sumopod.com/v1"
+    },
+    {
+      "title": "GPT-5.4 Heavyweight Architect (SumoPod)",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "apiKey": "sk-j3562xPgQ5mmHcS9rqpg2A",
+      "apiBase": "https://ai.sumopod.com/v1"
+    },
+    {
+      "title": "Claude Sonnet 4.6 (SumoPod Premium)",
+      "provider": "openai",
+      "model": "claude-sonnet-4-6",
+      "apiKey": "sk-j3562xPgQ5mmHcS9rqpg2A",
+      "apiBase": "https://ai.sumopod.com/v1"
+    },
+    {
+      "title": "GPT-4o (SumoPod)",
+      "provider": "openai",
+      "model": "gpt-4o",
+      "apiKey": "sk-j3562xPgQ5mmHcS9rqpg2A",
+      "apiBase": "https://ai.sumopod.com/v1"
+    },
+    {
+      "title": "Gemini 3.1 Pro (SumoPod - 1.04M Context)",
+      "provider": "openai",
+      "model": "gemini/gemini-3.1-pro-preview",
+      "apiKey": "sk-j3562xPgQ5mmHcS9rqpg2A",
+      "apiBase": "https://ai.sumopod.com/v1"
+    },
+    {
+      "title": "GPT-4o Mini (SumoPod - Super Hemat)",
+      "provider": "openai",
+      "model": "gpt-4o-mini",
+      "apiKey": "sk-j3562xPgQ5mmHcS9rqpg2A",
+      "apiBase": "https://ai.sumopod.com/v1"
+    },
+    {
+      "title": "MiniMax M2.7 Highspeed (SumoPod - Diskon 80%)",
+      "provider": "openai",
+      "model": "MiniMax-M2.7-highspeed",
+      "apiKey": "sk-j3562xPgQ5mmHcS9rqpg2A",
+      "apiBase": "https://ai.sumopod.com/v1"
+    },
+    {
+      "title": "Kimi K2.6 Marketing (SumoPod - Diskon 90%)",
+      "provider": "openai",
+      "model": "kimi-k2.6",
+      "apiKey": "sk-j3562xPgQ5mmHcS9rqpg2A",
+      "apiBase": "https://ai.sumopod.com/v1"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "DeepSeek V4 Flash (SumoPod Autocomplete)",
+    "provider": "openai",
+    "model": "deepseek-v4-flash",
+    "apiKey": "sk-j3562xPgQ5mmHcS9rqpg2A",
+    "apiBase": "https://ai.sumopod.com/v1"
+  }
+}
